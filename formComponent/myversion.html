@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+<style>
+body {
+  font-family: Helvetica Neue, Arial, sans-serif;
+  font-size: 14px;
+  color: #444;
+}
+
+table {
+  border: 2px solid #42b983;
+  border-radius: 3px;
+  background-color: #fff;
+}
+
+th {
+  background-color: #42b983;
+  color: rgba(255,255,255,0.66);
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -user-select: none;
+}
+
+td {
+  background-color: #f9f9f9;
+}
+
+th, td {
+  min-width: 120px;
+  padding: 10px 20px;
+}
+
+th.active {
+  color: #fff;
+}
+
+th.active .arrow {
+  opacity: 1;
+}
+
+.arrow {
+  display: inline-block;
+  vertical-align: middle;
+  width: 0;
+  height: 0;
+  margin-left: 5px;
+  opacity: 0.66;
+}
+
+.arrow.asc {
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 4px solid #fff;
+}
+
+.arrow.dsc {
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid #fff;
+}
+
+#search {
+  margin-bottom: 10px;
+}
+</style>
+</head>
+<body>
+<!-- component template -->
+<script type="text/x-template" id="grid-template">
+  <table>
+    <thead>
+      <tr>
+        <th v-for="key in columns"
+            class=""
+            :class="{active: key == sortKey}"
+            @click="sortBy(key)">
+          {{ key | capticalize }}
+          <span class="arrow"
+               :class="sortOrder[key] > 0 ? 'asc' : 'dsc'">
+          </span>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="entry in data | filterBy filterKey | orderBy sortKey sortOrder[sortKey]">
+        <td v-for="key in columns">
+          {{entry[key]}}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</script>
+<!-- demo root element -->
+<div id="demo">
+  <form id="search">
+    Search <input name="query" v-model="querySelector">
+  </form>
+  <demo-grid
+    :data="gridData"
+    :columns="gridColumns"
+    :filter-Key="querySelector">
+    </demo-grid>
+</div>
+
+<script src="../vue.js"></script>
+<script>
+// register the grid component
+Vue.component('demo-grid', {
+  template: '#grid-template',
+  props: {
+    data: Array,
+    columns: Array,
+    filterKey: String
+  },
+  data: function() {
+    var sortOrder = {};
+    this.columns.forEach(function (key) {
+      sortOrder[key] = 1;
+    });
+
+    return {
+      sortKey: "",
+      sortOrder: sortOrder
+    }
+  },
+  methods: {
+    sortBy: function(key) {
+      this.sortKey = key;
+      this.sortOrder[key] = this.sortOrder[key] * -1;
+    }
+  }
+})
+
+var demo = new Vue({
+  el: "#demo",
+  data: {
+    querySelector: "",
+    gridColumns: ['name', 'power'],
+    gridData: [
+      { name: 'Chuck Norris', power: Infinity },
+      { name: 'Bruce Lee', power: 9000 },
+      { name: 'Jackie Chan', power: 7000 },
+      { name: 'Jet Li', power: 8000 }
+    ]
+  }
+})
+</script>	
+</body>
+</html>
+
+<!-- 
+1.先分析有什么功能
+2.分析v vm m分别是什么
+3.分析如何实现v的dom操作
+4.基于dom操作，m要提供什么数据
+5.基于数据来写template && vue实例
+6.prop传递的都是model的原始数据，但是基于原始数据的一些操作，譬如sortKey，sortOrder,sortBy就可以直接在template上搞
+-->
+

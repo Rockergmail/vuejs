@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+<style>
+body {
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+ul {
+  padding: 0;
+}
+
+.user {
+  height: 30px;
+  line-height: 30px;
+  padding: 10px;
+  border-top: 1px solid #eee;
+  overflow: hidden;
+  transition: all .25s ease;
+}
+
+.user:last-child {
+  border-bottom: 1px solid #eee;
+}
+
+.v-enter, .v-leave {
+  height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  border-top-width: 0;
+  border-bottom-width: 0;
+}
+
+.errors {
+  color: #f00;
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <p class="user" v-for="user in users" transition>
+    <span>{{$index}} - {{user.name}} - {{user.email}}</span>
+    <button v-on:click="removeUser($index)">X</button>
+  </p>
+
+  <form id="form" v-on:submit.prevent="addUser">
+    <input id="focusMe" v-model="newUser.name"/>
+    <input v-model="newUser.email"/>
+    <button>Add User</button>
+  </form> 
+
+  <p class="errors">
+    <span v-show="!validation.name">Name cannot be empty</span>
+    <span v-show="!validation.email">Please provide a valid email address.</span>
+  </p>
+</div>
+
+<script src="../vue.js"></script>
+<script>
+var baseURL = 'https://vue-demo.firebaseIO.com/'
+var emailRE = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+var focusMe = document.querySelector("#focusMe");
+var vm = new Vue({
+  el: '#app',
+  data: {
+    users:[],
+    newUser: {
+      name: "",
+      email: ""
+    }
+  },
+
+  computed: {
+    validation: function(){
+      return {
+        name: !!this.newUser.name.trim(),
+        email: emailRE.test(this.newUser.email)
+      }
+    },
+    isValid: function(){
+      var validation = this.validation
+      return Object.keys(validation).every(function(key) {
+        return validation[key]
+      });
+    }
+  },
+
+  methods: {
+    addUser: function() {
+      if(this.isValid) {
+        var newUser = JSON.parse(JSON.stringify(this.newUser));
+        this.users.push(newUser);
+        this.newUser.email = "";
+        this.newUser.name = "";
+        focusMe.focus();
+      }
+    },
+    removeUser: function($index) {
+      this.users.splice($index, 1);
+    }
+  }
+});
+
+</script>	
+</body>
+</html>
