@@ -1,0 +1,136 @@
+<style>
+.modal-mask {
+  position: fixed;
+  z-index: 9998;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, .5);
+  display: table;
+  transition: opacity .3s ease;
+}
+
+.modal-wrapper {
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.modal-container {
+  width: 300px;
+  margin: 0px auto;
+  padding: 20px 30px;
+  background-color: #fff;
+  border-radius: 2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
+  transition: all .3s ease;
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+.modal-header h3 {
+  margin-top: 0;
+  color: #42b983;
+}
+
+.modal-body {
+  margin: 20px 0;
+}
+
+.modal-default-button {
+  float: right;
+}
+
+/*
+ * the following styles are auto-applied to elements with
+ * v-transition="modal" when their visiblity is toggled
+ * by Vue.js.
+ *
+ * You can easily play with the modal transition by editing
+ * these styles.
+ */
+
+.modal-enter, .modal-leave {
+  opacity: 0;
+}
+
+.modal-enter .modal-container,
+.modal-leave .modal-container {
+  -webkit-transform: scale(1.1);
+  transform: scale(1.1);
+}
+
+</style>
+
+<!-- template for the modal component -->
+<!-- 这里的transition="modal"的modal是哪个意思? -->
+<script type="x/template" id="modal-template">
+  <div class="modal-mask" v-show="show" transition="modal">
+    <div class="modal-wrapper">
+      <div class="modal-container">
+
+        <div class="modal-header">
+          <slot name="header">
+            default header
+          </slot>
+        </div>
+        
+        <div class="modal-body">
+          <slot name="body">
+            default body
+          </slot>
+        </div>
+
+        <div class="modal-footer">
+          <slot name="footer">
+            default footer
+            <button class="modal-default-button"
+              @click="show = false">
+              OK
+            </button>
+          </slot>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+
+<!-- app -->
+<div id="app">
+  <button id="show-modal" @click="showModal = true">Show Modal</button>
+  <!-- use the modal component, pass in the prop -->
+  <!-- show.sync 是双向绑定的作用-->
+  <modal :show="showModal">
+    <!--
+      you can use custom content here to overwrite
+      default content
+    -->
+    <h3 slot="header">custom header</h3>
+  </modal>
+</div>
+
+<script src='../vue.js'></script>
+<script>
+// register modal component
+Vue.component('modal', {
+  template: '#modal-template',
+  props: {
+    show: {
+      type: Boolean,
+      required: true  
+    }
+  }
+})
+
+// start app
+var vm = new Vue({
+  el: '#app',
+  data: {
+    showModal: false
+  }
+})
+</script>
+
+<!-- 
+1.prop默认是单向绑定，所以需要设置.sync以及再twoWay
+2.prop默认是单向绑定的，当父组件属性发生改变时，父组件可以传递给子组件，但是反过来不可以。去掉twoWay属性之后，追踪vm.showModal，点击"show Modal"后,false->true，点击“ok”之后，还是true，再点击"show Modal"之后，还是true。手动将vm.showModal=false之后，就会再显示子组件。所以说#app是父组件，#modal是子组件
+-->
