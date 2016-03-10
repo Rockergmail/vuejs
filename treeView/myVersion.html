@@ -26,7 +26,7 @@ ul {
       {{model.name}}
       <span v-if="isFolder">[{{open ? '-' : '+'}}]</span>
     </div>
-    <ul v-show="open" v-if="isFolder">
+    <ul v-show="open"  v-if="isFolder">
       <item
         class="item"
         v-for="model in model.children"
@@ -36,6 +36,7 @@ ul {
     </ul>
   </li>
 </script>
+
 
 <p>(You can double click on an item to turn it into a folder.)</p>
 
@@ -81,48 +82,53 @@ var data = {
 
 // define the item component
 Vue.component('item', {
-  template: '#item-template',
-  props: {
+  template: "#item-template",
+  props:{
     model: Object
   },
-  data: function () {
+  data: function(){
     return {
       open: false
     }
   },
   computed: {
-    isFolder: function () {
-      return this.model.children &&
-        this.model.children.length
+    isFolder: function() {
+      return this.model.children && this.model.children.length
     }
   },
   methods: {
-    toggle: function () {
+    toggle: function() {
       if (this.isFolder) {
-        this.open = !this.open
+        this.open = !this.open;
       }
     },
-    changeType: function () {
+    changeType: function() {
       if (!this.isFolder) {
-        Vue.set(this.model, 'children', []) // 设置对象的属性
-        this.addChild()
+        Vue.set(this.model, "children", []);
+        this.addChild();
         this.open = true
       }
     },
-    addChild: function () {
+    addChild: function() {
       this.model.children.push({
         name: 'new stuff'
-      })
+      });
     }
   }
-})
+});
+
 
 // boot up the demo
 var demo = new Vue({
-  el: '#demo',
+  el: "#demo",
   data: {
     treeData: data
   }
 })
 
 </script>
+
+<!-- 
+1.就是说，vue引擎会一边渲染一边检测有没有要渲染的标签 
+2.巧妙的地方在于判断有没有children->是不是Folder
+-->
